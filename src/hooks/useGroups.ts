@@ -76,12 +76,14 @@ export const useCreateGroup = () => {
         }
       });
       
+      // Ajouter les nouveaux utilisateurs à la liste globale
       if (newUsers.length > 0) {
         users.push(...newUsers);
         saveUsers(users);
       }
       
-      const allUsers = [...users, ...newUsers];
+      // Récupérer tous les utilisateurs (existants + nouveaux)
+      const allUsers = getUsers();
       const groupMembers = allUsers.filter(user => 
         data.members.includes(user.name)
       );

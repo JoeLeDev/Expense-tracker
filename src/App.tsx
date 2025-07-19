@@ -3,11 +3,15 @@ import { useGroups } from './hooks/useGroups';
 import GroupList from './components/GroupList';
 import GroupDetail from './components/GroupDetail';
 import CreateGroupModal from './components/CreateGroupModal';
+import EditGroupModal from './components/EditGroupModal';
+import { Group } from './types';
 import './App.css';
 
 function App() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const { data: groups = [], isLoading, error } = useGroups();
 
   const handleGroupSelect = (groupId: string) => {
@@ -27,6 +31,17 @@ function App() {
     alert('Groupe créé avec succès !');
   };
 
+  const handleEditGroup = (group: Group) => {
+    setEditingGroup(group);
+    setIsEditModalOpen(true);
+  };
+
+  const handleGroupEdited = () => {
+    setIsEditModalOpen(false);
+    setEditingGroup(null);
+    alert('Groupe modifié avec succès !');
+  };
+
   if (error) {
     return (
       <div className="container">
@@ -43,7 +58,7 @@ function App() {
       <div className="container">
         {/* Header */}
         <header className="header">
-          <h1 className="title">💳 Sumeria Expense Tracker</h1>
+          <h1 className="title"> Sumeria Expense Tracker</h1>
           <p className="subtitle">Gérez vos remboursements entre amis simplement</p>
         </header>
 
@@ -86,6 +101,7 @@ function App() {
               <GroupList 
                 groups={groups} 
                 onGroupSelect={handleGroupSelect}
+                onGroupEdit={handleEditGroup}
               />
             )}
           </div>
@@ -96,6 +112,17 @@ function App() {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={handleGroupCreated}
+        />
+
+        {/* Edit Group Modal */}
+        <EditGroupModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingGroup(null);
+          }}
+          onSuccess={handleGroupEdited}
+          group={editingGroup}
         />
       </div>
     </div>

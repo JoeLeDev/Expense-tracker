@@ -189,6 +189,11 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.group-info {
+  flex: 1;
+  cursor: pointer;
+}
+
 .group-name {
   font-size: 1.25rem;
   font-weight: 600;
@@ -206,10 +211,23 @@ body {
   color: #a0aec0;
 }
 
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-actions .btn {
+  padding: 0.5rem;
+  min-width: auto;
+  font-size: 0.875rem;
+}
+
 .arrow {
   font-size: 1.5rem;
   color: #cbd5e0;
   transition: transform 0.2s ease;
+  margin-left: 0.5rem;
 }
 
 .group-card:hover .arrow {
