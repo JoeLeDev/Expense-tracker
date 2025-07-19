@@ -4,6 +4,7 @@ import GroupList from './components/GroupList';
 import GroupDetail from './components/GroupDetail';
 import CreateGroupModal from './components/CreateGroupModal';
 import EditGroupModal from './components/EditGroupModal';
+import HistoryModal from './components/HistoryModal';
 import { Group } from './types';
 import './App.css';
 
@@ -12,6 +13,7 @@ function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const { data: groups = [], isLoading, error } = useGroups();
 
   const handleGroupSelect = (groupId: string) => {
@@ -60,6 +62,13 @@ function App() {
         <header className="header">
           <h1 className="title"> Sumeria Expense Tracker</h1>
           <p className="subtitle">Gérez vos remboursements entre amis simplement</p>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => setIsHistoryModalOpen(true)}
+            style={{ marginTop: '10px' }}
+          >
+            📋 Historique
+          </button>
         </header>
 
         {/* Navigation */}
@@ -123,6 +132,12 @@ function App() {
           }}
           onSuccess={handleGroupEdited}
           group={editingGroup}
+        />
+
+        {/* History Modal */}
+        <HistoryModal
+          isOpen={isHistoryModalOpen}
+          onClose={() => setIsHistoryModalOpen(false)}
         />
       </div>
     </div>

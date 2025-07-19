@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Group, GroupFormData, User } from '../types';
+import { useAddHistoryEntry, createGroupHistoryEntry } from './useHistory';
 
 // Simulation d'une API locale avec localStorage
 const GROUPS_KEY = 'sumeria_groups';
@@ -57,6 +58,7 @@ export const useUsers = () => {
 
 export const useCreateGroup = () => {
   const queryClient = useQueryClient();
+  const addHistoryEntry = useAddHistoryEntry();
 
   return useMutation<Group, Error, GroupFormData>({
     mutationFn: async (data: GroupFormData) => {
@@ -99,6 +101,19 @@ export const useCreateGroup = () => {
       
       groups.push(newGroup);
       saveGroups(groups);
+      
+      // Enregistrer dans l'historique
+      const historyEntry = createGroupHistoryEntry(
+        'CREATE_GROUP',
+        newGroup,
+        'system',
+        'Système',
+        {
+          description: `Groupe "${newGroup.name}" créé avec ${newGroup.members.length} membre(s)`
+        }
+      );
+      addHistoryEntry.mutate(historyEntry);
+      
       return newGroup;
     },
     onSuccess: () => {
@@ -110,6 +125,7 @@ export const useCreateGroup = () => {
 
 export const useUpdateGroup = () => {
   const queryClient = useQueryClient();
+  const addHistoryEntry = useAddHistoryEntry();
 
   return useMutation<Group, Error, { id: string; updates: Partial<GroupFormData> }>({
     mutationFn: async (data: { id: string; updates: Partial<GroupFormData> }) => {
@@ -133,9 +149,25 @@ export const useUpdateGroup = () => {
         );
       }
       
+      const oldGroup = groups[index];
       groups[index] = updatedGroup;
       
       saveGroups(groups);
+      
+      // Enregistrer dans l'historique
+      const historyEntry = createGroupHistoryEntry(
+        'UPDATE_GROUP',
+        updatedGroup,
+        'system',
+        'Système',
+        {
+          before: oldGroup,
+          after: updatedGroup,
+          description: `Groupe "${updatedGroup.name}" modifié`
+        }
+      );
+      addHistoryEntry.mutate(historyEntry);
+      
       return groups[index];
     },
     onSuccess: () => {
@@ -146,6 +178,7 @@ export const useUpdateGroup = () => {
 
 export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
+  const addHistoryEntry = useAddHistoryEntry();
 
   return useMutation<Group, Error, string>({
     mutationFn: async (groupId: string) => {
@@ -155,6 +188,19 @@ export const useDeleteGroup = () => {
       
       const filteredGroups = groups.filter(g => g.id !== groupId);
       saveGroups(filteredGroups);
+      
+      // Enregistrer dans l'historique
+      const historyEntry = createGroupHistoryEntry(
+        'DELETE_GROUP',
+        group,
+        'system',
+        'Système',
+        {
+          description: `Groupe "${group.name}" supprimé`
+        }
+      );
+      addHistoryEntry.mutate(historyEntry);
+      
       return group;
     },
     onSuccess: () => {

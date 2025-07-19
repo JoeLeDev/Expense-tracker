@@ -54,4 +54,28 @@ export interface GroupFormData {
   name: string;
   description?: string;
   members: string[]; // Array of user names/emails
+}
+
+export type HistoryAction = 
+  | 'CREATE_GROUP'
+  | 'UPDATE_GROUP'
+  | 'DELETE_GROUP'
+  | 'CREATE_EXPENSE'
+  | 'UPDATE_EXPENSE'
+  | 'DELETE_EXPENSE';
+
+export interface HistoryEntry {
+  id: string;
+  action: HistoryAction;
+  entityType: 'group' | 'expense';
+  entityId: string;
+  entityName: string;
+  userId: string;
+  userName: string;
+  timestamp: Date;
+  details: {
+    before?: any;
+    after?: any;
+    description: string;
+  };
 } 
