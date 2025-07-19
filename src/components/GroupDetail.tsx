@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useGroup } from '../hooks/useGroups';
+import { useGroups } from '../hooks/useGroups';
 import { useExpenses } from '../hooks/useExpenses';
-import { calculateBalances, formatCurrency, getTotalExpenses } from '../utils/balanceCalculator';
 import ExpenseList from './ExpenseList';
 import CreateExpenseModal from './CreateExpenseModal';
+import EditExpenseModal from './EditExpenseModal';
 import BalanceSummary from './BalanceSummary';
+import { Expense } from '../types';
 
 interface GroupDetailProps {
   groupId: string;
@@ -12,84 +13,96 @@ interface GroupDetailProps {
 }
 
 const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
-  const [isCreateExpenseModalOpen, setIsCreateExpenseModalOpen] = useState(false);
-  const { data: group, isLoading: groupLoading, error: groupError } = useGroup(groupId);
-  const { data: expenses = [], isLoading: expensesLoading, error: expensesError } = useExpenses(groupId);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  
+  const { data: groups = [] } = useGroups();
+  const { data: expenses = [] } = useExpenses(groupId);
+  
+  const group = groups.find(g => g.id === groupId);
+  const groupExpenses = expenses.filter(expense => expense.groupId === groupId);
 
-  const handleCreateExpense = () => {
-    setIsCreateExpenseModalOpen(true);
-  };
-
-  const handleExpenseCreated = () => {
-    setIsCreateExpenseModalOpen(false);
-    alert('Dépense ajoutée avec succès !');
-  };
-
-  if (groupLoading || expensesLoading) {
-    return (
-      <div className="loading">
-        <p>Chargement...</p>
-      </div>
-    );
-  }
-
-  if (groupError || expensesError || !group) {
+  if (!group) {
     return (
       <div className="error">
-        <h2>Erreur</h2>
-        <p>Impossible de charger les détails du groupe.</p>
+        <h2>Groupe non trouvé</h2>
         <button className="btn btn-primary" onClick={onBack}>
-          Retour
+          Retour aux groupes
         </button>
       </div>
     );
   }
 
-  const balances = calculateBalances(expenses, group.members);
-  const totalExpenses = getTotalExpenses(expenses);
+  const handleCreateExpense = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleExpenseCreated = () => {
+    setIsCreateModalOpen(false);
+    alert('Dépense créée avec succès !');
+  };
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setIsEditModalOpen(true);
+  };
+
+  const handleExpenseEdited = () => {
+    setIsEditModalOpen(false);
+    setEditingExpense(null);
+    alert('Dépense modifiée avec succès !');
+  };
 
   return (
     <div className="group-detail">
-      {/* Group Header */}
       <div className="group-header">
-        <div className="group-info">
-          <h2 className="group-title">{group.name}</h2>
-          {group.description && (
-            <p className="group-description">{group.description}</p>
-          )}
-          <div className="group-stats">
-            <span className="stat">
-              {expenses.length} dépense{expenses.length > 1 ? 's' : ''}
-            </span>
-            <span className="stat">
-              Total: {formatCurrency(totalExpenses)}
-            </span>
-          </div>
+        <h2>{group.name}</h2>
+        {group.description && (
+          <p className="group-description">{group.description}</p>
+        )}
+        <div className="group-members">
+          <strong>Membres :</strong> {group.members.map(member => member.name).join(', ')}
         </div>
+      </div>
+
+      <div className="section-header">
+        <h3>Résumé des soldes</h3>
+      </div>
+      <BalanceSummary expenses={groupExpenses} users={group.members} />
+
+      <div className="section-header">
+        <h3>Dépenses</h3>
         <button className="btn btn-primary" onClick={handleCreateExpense}>
           + Ajouter une dépense
         </button>
       </div>
 
-      {/* Balance Summary */}
-      <BalanceSummary balances={balances} />
-
-      {/* Expenses List */}
-      <div className="expenses-section">
-        <h3>Dépenses récentes</h3>
-        <ExpenseList 
-          expenses={expenses} 
-          groupMembers={group.members}
-        />
-      </div>
+      <ExpenseList 
+        expenses={groupExpenses}
+        users={group.members}
+        onExpenseEdit={handleEditExpense}
+      />
 
       {/* Create Expense Modal */}
       <CreateExpenseModal
-        isOpen={isCreateExpenseModalOpen}
-        onClose={() => setIsCreateExpenseModalOpen(false)}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleExpenseCreated}
         groupId={groupId}
-        groupMembers={group.members}
+        users={group.members}
+      />
+
+      {/* Edit Expense Modal */}
+      <EditExpenseModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingExpense(null);
+        }}
+        onSuccess={handleExpenseEdited}
+        expense={editingExpense}
+        users={group.members}
       />
     </div>
   );

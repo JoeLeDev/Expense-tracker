@@ -1,97 +1,115 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Expense, ExpenseFormData } from '../types';
 
-// Simulation d'une API locale avec localStorage
-const EXPENSES_KEY = 'sumeria_expenses';
-
+// Récupérer les dépenses depuis localStorage
 const getExpenses = (): Expense[] => {
-  const stored = localStorage.getItem(EXPENSES_KEY);
-  return stored ? JSON.parse(stored).map((expense: any) => ({
-    ...expense,
-    date: new Date(expense.date),
-    createdAt: new Date(expense.createdAt),
-    updatedAt: new Date(expense.updatedAt),
-  })) : [];
+  try {
+    const stored = localStorage.getItem('expenses');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des dépenses:', error);
+    return [];
+  }
 };
 
-const saveExpenses = (expenses: Expense[]) => {
-  localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses));
+// Sauvegarder les dépenses dans localStorage
+const saveExpenses = (expenses: Expense[]): void => {
+  try {
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des dépenses:', error);
+    throw error;
+  }
 };
 
-export const useExpenses = (groupId?: string) => {
+// Hook pour récupérer les dépenses d'un groupe
+export const useExpenses = (groupId: string) => {
   return useQuery({
     queryKey: ['expenses', groupId],
     queryFn: () => {
-      const expenses = getExpenses();
-      return groupId ? expenses.filter(expense => expense.groupId === groupId) : expenses;
-    },
+      const allExpenses = getExpenses();
+      return allExpenses.filter(expense => expense.groupId === groupId);
+    }
   });
 };
 
+// Hook pour créer une dépense
 export const useCreateExpense = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Expense, Error, ExpenseFormData & { groupId: string }>({
-    mutationFn: async (data: ExpenseFormData & { groupId: string }) => {
+  return useMutation({
+    mutationFn: async (expenseData: ExpenseFormData & { groupId: string }) => {
       const expenses = getExpenses();
       const newExpense: Expense = {
         id: Date.now().toString(),
-        ...data,
-        date: data.date || new Date(),
+        groupId: expenseData.groupId,
+        amount: expenseData.amount,
+        description: expenseData.description,
+        paidBy: expenseData.paidBy,
+        paidFor: expenseData.paidFor,
+        category: expenseData.category,
+        date: expenseData.date,
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       };
-      
-      expenses.push(newExpense);
-      saveExpenses(expenses);
+
+      const updatedExpenses = [...expenses, newExpense];
+      saveExpenses(updatedExpenses);
       return newExpense;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['expenses', variables.groupId] });
-    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    }
   });
 };
 
+// Hook pour mettre à jour une dépense
 export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Expense, Error, { id: string; updates: Partial<ExpenseFormData> }>({
-    mutationFn: async (data: { id: string; updates: Partial<ExpenseFormData> }) => {
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<ExpenseFormData> }) => {
       const expenses = getExpenses();
-      const index = expenses.findIndex(expense => expense.id === data.id);
+      const expenseIndex = expenses.findIndex(expense => expense.id === id);
       
-      if (index === -1) throw new Error('Expense not found');
-      
-      expenses[index] = {
-        ...expenses[index],
-        ...data.updates,
-        updatedAt: new Date(),
+      if (expenseIndex === -1) {
+        throw new Error('Dépense non trouvée');
+      }
+
+      const updatedExpense = {
+        ...expenses[expenseIndex],
+        ...updates,
+        updatedAt: new Date()
       };
-      
+
+      expenses[expenseIndex] = updatedExpense;
       saveExpenses(expenses);
-      return expenses[index];
+      return updatedExpense;
     },
-    onSuccess: (updatedExpense) => {
-      queryClient.invalidateQueries({ queryKey: ['expenses', updatedExpense.groupId] });
-    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    }
   });
 };
 
+// Hook pour supprimer une dépense
 export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Expense, Error, string>({
+  return useMutation({
     mutationFn: async (expenseId: string) => {
       const expenses = getExpenses();
-      const expense = expenses.find(e => e.id === expenseId);
-      if (!expense) throw new Error('Expense not found');
+      const filteredExpenses = expenses.filter(expense => expense.id !== expenseId);
       
-      const filteredExpenses = expenses.filter(e => e.id !== expenseId);
+      if (filteredExpenses.length === expenses.length) {
+        throw new Error('Dépense non trouvée');
+      }
+
       saveExpenses(filteredExpenses);
-      return expense;
+      return expenseId;
     },
-    onSuccess: (deletedExpense) => {
-      queryClient.invalidateQueries({ queryKey: ['expenses', deletedExpense.groupId] });
-    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    }
   });
 }; 
