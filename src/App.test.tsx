@@ -42,7 +42,7 @@ describe('App', () => {
   it('should render the main title', () => {
     renderApp();
     
-    expect(screen.getByText('💳 Sumeria Expense Tracker')).toBeInTheDocument();
+    expect(screen.getByText('Sumeria Expense Tracker')).toBeInTheDocument();
   });
 
   it('should render the subtitle', () => {

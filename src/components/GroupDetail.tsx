@@ -6,6 +6,7 @@ import CreateExpenseModal from './CreateExpenseModal';
 import EditExpenseModal from './EditExpenseModal';
 import BalanceSummary from './BalanceSummary';
 import { Expense } from '../types';
+import { calculateBalances } from '../utils/balanceCalculator';
 
 interface GroupDetailProps {
   groupId: string;
@@ -69,7 +70,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
       <div className="section-header">
         <h3>Résumé des soldes</h3>
       </div>
-      <BalanceSummary expenses={groupExpenses} users={group.members} />
+      <BalanceSummary balances={calculateBalances(groupExpenses, group.members)} />
 
       <div className="section-header">
         <h3>Dépenses</h3>

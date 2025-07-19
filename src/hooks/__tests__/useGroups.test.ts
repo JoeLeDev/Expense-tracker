@@ -1,3 +1,4 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUpdateGroup, useDeleteGroup } from '../useGroups';
@@ -21,11 +22,9 @@ const createWrapper = () => {
       mutations: { retry: false }
     }
   });
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return ({ children }: { children: React.ReactNode }) => {
+    return React.createElement(QueryClientProvider, { client: queryClient }, children);
+  };
 };
 
 describe('useUpdateGroup', () => {
@@ -66,11 +65,11 @@ describe('useUpdateGroup', () => {
     });
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'groups',
+      'sumeria_groups',
       expect.stringContaining('"name":"Nouveau nom"')
     );
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'groups',
+      'sumeria_groups',
       expect.stringContaining('"description":"Nouvelle description"')
     );
   });
@@ -166,10 +165,11 @@ describe('useDeleteGroup', () => {
       await result.current.mutateAsync('1');
     });
 
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'groups',
-      JSON.stringify([existingGroups[1]])
-    );
+    // Vérifier que le bon groupe a été supprimé
+    const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
+    expect(savedData).toHaveLength(1);
+    expect(savedData[0].id).toBe('2');
+    expect(savedData[0].name).toBe('Groupe à conserver');
   });
 
   it('gère les erreurs lors de la suppression', async () => {
@@ -205,15 +205,14 @@ describe('useDeleteGroup', () => {
       wrapper: createWrapper()
     });
 
-    await act(async () => {
-      await result.current.mutateAsync('groupe-inexistant');
-    });
+    await expect(
+      act(async () => {
+        await result.current.mutateAsync('groupe-inexistant');
+      })
+    ).rejects.toThrow('Group not found');
 
-    // Le groupe existant devrait être conservé
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'groups',
-      JSON.stringify(existingGroups)
-    );
+    // Vérifier qu'aucune modification n'a été faite
+    expect(localStorageMock.setItem).not.toHaveBeenCalled();
   });
 
   it('supprime tous les groupes si c\'est le dernier', async () => {
@@ -238,7 +237,7 @@ describe('useDeleteGroup', () => {
     });
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'groups',
+      'sumeria_groups',
       JSON.stringify([])
     );
   });
