@@ -5,6 +5,7 @@ import ExpenseList from './ExpenseList';
 import CreateExpenseModal from './CreateExpenseModal';
 import EditExpenseModal from './EditExpenseModal';
 import BalanceSummary from './BalanceSummary';
+import ExportModal from './ExportModal';
 import { Expense } from '../types';
 import { calculateBalances } from '../utils/balanceCalculator';
 
@@ -17,6 +18,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   
   const { data: groups = [] } = useGroups();
   const { data: expenses = [] } = useExpenses(groupId);
@@ -74,9 +76,14 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
 
       <div className="section-header">
         <h3>Dépenses</h3>
-        <button className="btn btn-primary" onClick={handleCreateExpense}>
-          + Ajouter une dépense
-        </button>
+        <div className="section-actions">
+          <button className="btn btn-secondary" onClick={() => setIsExportModalOpen(true)}>
+            📊 Exporter
+          </button>
+          <button className="btn btn-primary" onClick={handleCreateExpense}>
+            + Ajouter une dépense
+          </button>
+        </div>
       </div>
 
       <ExpenseList 
@@ -103,6 +110,15 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
         }}
         onSuccess={handleExpenseEdited}
         expense={editingExpense}
+        users={group.members}
+      />
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        group={group}
+        expenses={groupExpenses}
         users={group.members}
       />
     </div>
