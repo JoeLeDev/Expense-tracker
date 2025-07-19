@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Group } from '../types';
 import { useDeleteGroup } from '../hooks/useGroups';
 
