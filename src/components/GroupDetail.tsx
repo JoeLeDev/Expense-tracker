@@ -98,7 +98,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleExpenseCreated}
         groupId={groupId}
-        users={group.members}
+        groupMembers={group.members}
       />
 
       {/* Edit Expense Modal */}
