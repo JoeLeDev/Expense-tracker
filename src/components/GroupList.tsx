@@ -15,7 +15,6 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer le groupe "${groupName}" ? Cette action est irréversible.`)) {
       try {
         await deleteGroupMutation.mutateAsync(groupId);
-        alert('Groupe supprimé avec succès');
       } catch (error) {
         alert('Erreur lors de la suppression du groupe');
       }

@@ -59,11 +59,6 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
           members
         }
       });
-      notify({
-        title: 'Groupe modifié',
-        description: 'Le groupe a été modifié avec succès.',
-        status: 'success',
-      });
       onSuccess();
       onClose();
     } catch (error) {

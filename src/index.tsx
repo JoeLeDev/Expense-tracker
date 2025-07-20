@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ChakraProvider } from '@chakra-ui/react';
-import { Toaster } from '@chakra-ui/react/components/toast';
+import { Toaster, toaster } from './hooks/notify';
 import './index.css';
 import App from './App';
 
@@ -23,12 +22,33 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ChakraProvider>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <Toaster />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ChakraProvider>
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <Toaster toaster={toaster}>
+        {(toast) => (
+          <div
+            data-scope="toast"
+            data-part="root"
+            style={{
+              background: toast.type === 'success' ? '#38A169' : toast.type === 'error' ? '#E53E3E' : '#2d3748',
+              color: '#fff',
+              borderRadius: 8,
+              padding: '16px 24px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              fontSize: '1rem',
+              marginTop: 12,
+              maxWidth: 350,
+              position: 'relative',
+            }}
+          >
+            <div data-part="title" style={{ fontWeight: 'bold', marginBottom: 4 }}>{toast.title}</div>
+            {toast.description && (
+              <div data-part="description" style={{ fontSize: '0.95em', opacity: 0.85 }}>{toast.description}</div>
+            )}
+          </div>
+        )}
+      </Toaster>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   </React.StrictMode>
 );

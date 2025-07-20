@@ -30,7 +30,6 @@ function App() {
 
   const handleGroupCreated = () => {
     setIsCreateModalOpen(false);
-    alert('Groupe créé avec succès !');
   };
 
   const handleEditGroup = (group: Group) => {
@@ -41,7 +40,6 @@ function App() {
   const handleGroupEdited = () => {
     setIsEditModalOpen(false);
     setEditingGroup(null);
-    alert('Groupe modifié avec succès !');
   };
 
   if (error) {
