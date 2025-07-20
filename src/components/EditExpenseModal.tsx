@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUpdateExpense } from '../hooks/useExpenses';
 import { Expense, User } from '../types';
+import { Button } from '../ui/Button';
 
 interface EditExpenseModalProps {
   isOpen: boolean;
@@ -107,7 +108,13 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-expense-title">
         <div className="modal-header">
           <h2 id="edit-expense-title">Modifier la dépense</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
+          <Button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fermer la modale"
+          >
+            ×
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -200,22 +207,22 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
           </div>
 
           <div className="modal-actions">
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               aria-label="Annuler la modification de la dépense"
             >
               Annuler
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="btn btn-primary"
               disabled={updateExpenseMutation.isPending}
               aria-label="Modifier la dépense"
             >
               {updateExpenseMutation.isPending ? 'Modification...' : 'Modifier la dépense'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

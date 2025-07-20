@@ -2,6 +2,7 @@ import React from 'react';
 import { Expense, User } from '../types';
 import { useDeleteExpense } from '../hooks/useExpenses';
 import { formatCurrency } from '../utils/balanceCalculator';
+import { Button } from '../ui/Button';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -57,23 +58,27 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, users, onExpenseEdi
               </div>
             </div>
             <div className="expense-actions">
-              <button
+              <Button
                 className="btn btn-secondary btn-small"
                 onClick={() => onExpenseEdit(expense)}
                 title="Modifier la dépense"
                 aria-label={`Modifier la dépense ${expense.description}`}
+                size="small"
+                variant="secondary"
               >
                 ✏️
-              </button>
-              <button
+              </Button>
+              <Button
                 className="btn btn-danger btn-small"
                 onClick={() => handleDeleteExpense(expense.id, expense.description)}
                 title="Supprimer la dépense"
                 aria-label={`Supprimer la dépense ${expense.description}`}
+                size="small"
+                variant="danger"
                 disabled={deleteExpenseMutation.isPending}
               >
                 🗑️
-              </button>
+              </Button>
             </div>
           </div>
           

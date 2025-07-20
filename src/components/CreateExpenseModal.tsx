@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCreateExpense } from '../hooks/useExpenses';
 import { User } from '../types';
+import { Button } from '../ui/Button';
 
 interface CreateExpenseModalProps {
   isOpen: boolean;
@@ -90,7 +91,13 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="create-expense-title">
         <div className="modal-header">
           <h2 id="create-expense-title">Ajouter une dépense</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
+          <Button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fermer la modale"
+          >
+            ×
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -162,22 +169,22 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
             <label>Payé pour *</label>
             <div className="member-selection">
               <div className="member-selection-actions">
-                <button
+                <Button
                   type="button"
                   className="btn btn-secondary btn-small"
                   onClick={selectAllMembers}
                   aria-label="Tout sélectionner"
                 >
                   Tout sélectionner
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   className="btn btn-secondary btn-small"
                   onClick={clearAllMembers}
                   aria-label="Tout désélectionner"
                 >
                   Tout désélectionner
-                </button>
+                </Button>
               </div>
               <div className="member-checkboxes">
                 {groupMembers.map(member => (
@@ -196,22 +203,22 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
           </div>
 
           <div className="modal-actions">
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               aria-label="Annuler la création de la dépense"
             >
               Annuler
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="btn btn-primary"
               disabled={createExpenseMutation.isPending}
               aria-label="Ajouter la dépense"
             >
               {createExpenseMutation.isPending ? 'Ajout...' : 'Ajouter la dépense'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Group } from '../types';
 import { useDeleteGroup } from '../hooks/useGroups';
+import { Button } from '../ui/Button';
 
 interface GroupListProps {
   groups: Group[];
@@ -41,7 +42,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
             </div>
           </div>
           <div className="group-actions">
-            <button
+            <Button
               className="btn btn-secondary btn-small"
               onClick={(e) => {
                 e.stopPropagation();
@@ -49,10 +50,12 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
               }}
               title="Modifier le groupe"
               aria-label={`Modifier le groupe ${group.name}`}
+              size="small"
+              variant="secondary"
             >
               ✏️
-            </button>
-            <button
+            </Button>
+            <Button
               className="btn btn-danger btn-small"
               onClick={(e) => {
                 e.stopPropagation();
@@ -60,10 +63,12 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
               }}
               title="Supprimer le groupe"
               aria-label={`Supprimer le groupe ${group.name}`}
+              size="small"
+              variant="danger"
               disabled={deleteGroupMutation.isPending}
             >
               🗑️
-            </button>
+            </Button>
             <span className="arrow">→</span>
           </div>
         </div>

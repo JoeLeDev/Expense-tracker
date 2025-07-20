@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUpdateGroup } from '../hooks/useGroups';
 import { Group } from '../types';
 import { notify } from '../hooks/notify';
+import { Button } from '../ui/Button';
 
 interface EditGroupModalProps {
   isOpen: boolean;
@@ -108,7 +109,13 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-group-title">
         <div className="modal-header">
           <h2 id="edit-group-title">Modifier le groupe</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
+          <Button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fermer la modale"
+          >
+            ×
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -148,44 +155,44 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
                   aria-label={`Nom du membre ${index + 1}`}
                 />
                 {formData.members.length > 1 && (
-                  <button
+                  <Button
                     type="button"
                     className="btn btn-danger btn-small"
                     onClick={() => removeMember(index)}
                     aria-label={`Supprimer le membre ${index + 1}`}
                   >
                     ×
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={addMember}
               aria-label="Ajouter un membre"
             >
               + Ajouter un membre
-            </button>
+            </Button>
           </div>
 
           <div className="modal-actions">
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               aria-label="Annuler la modification du groupe"
             >
               Annuler
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="btn btn-primary"
               disabled={updateGroupMutation.isPending}
               aria-label="Modifier le groupe"
             >
               {updateGroupMutation.isPending ? 'Modification...' : 'Modifier le groupe'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

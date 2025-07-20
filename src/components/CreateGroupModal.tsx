@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCreateGroup } from '../hooks/useGroups';
+import { Button } from '../ui/Button';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -70,7 +71,13 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="create-group-title">
         <div className="modal-header">
           <h2 id="create-group-title">Créer un nouveau groupe</h2>
-          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
+          <Button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fermer la modale"
+          >
+            ×
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -110,44 +117,44 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                   aria-label={`Nom du membre ${index + 1}`}
                 />
                 {formData.members.length > 1 && (
-                  <button
+                  <Button
                     type="button"
                     className="btn btn-danger btn-small"
                     onClick={() => removeMember(index)}
                     aria-label={`Supprimer le membre ${index + 1}`}
                   >
                     ×
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={addMember}
               aria-label="Ajouter un membre"
             >
               + Ajouter un membre
-            </button>
+            </Button>
           </div>
 
           <div className="modal-actions">
-            <button
+            <Button
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
               aria-label="Annuler la création du groupe"
             >
               Annuler
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               className="btn btn-primary"
               disabled={createGroupMutation.isPending}
               aria-label="Créer le groupe"
             >
               {createGroupMutation.isPending ? 'Création...' : 'Créer le groupe'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
