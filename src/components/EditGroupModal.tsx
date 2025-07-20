@@ -105,10 +105,10 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-group-title">
         <div className="modal-header">
-          <h2>Modifier le groupe</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <h2 id="edit-group-title">Modifier le groupe</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -145,12 +145,14 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
                   onChange={(e) => updateMember(index, e.target.value)}
                   placeholder="Nom du membre"
                   required
+                  aria-label={`Nom du membre ${index + 1}`}
                 />
                 {formData.members.length > 1 && (
                   <button
                     type="button"
                     className="btn btn-danger btn-small"
                     onClick={() => removeMember(index)}
+                    aria-label={`Supprimer le membre ${index + 1}`}
                   >
                     ×
                   </button>
@@ -161,6 +163,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
               type="button"
               className="btn btn-secondary"
               onClick={addMember}
+              aria-label="Ajouter un membre"
             >
               + Ajouter un membre
             </button>
@@ -171,6 +174,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
+              aria-label="Annuler la modification du groupe"
             >
               Annuler
             </button>
@@ -178,6 +182,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
               type="submit"
               className="btn btn-primary"
               disabled={updateGroupMutation.isPending}
+              aria-label="Modifier le groupe"
             >
               {updateGroupMutation.isPending ? 'Modification...' : 'Modifier le groupe'}
             </button>

@@ -87,10 +87,10 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="create-expense-title">
         <div className="modal-header">
-          <h2>Ajouter une dépense</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <h2 id="create-expense-title">Ajouter une dépense</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -166,6 +166,7 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
                   type="button"
                   className="btn btn-secondary btn-small"
                   onClick={selectAllMembers}
+                  aria-label="Tout sélectionner"
                 >
                   Tout sélectionner
                 </button>
@@ -173,6 +174,7 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
                   type="button"
                   className="btn btn-secondary btn-small"
                   onClick={clearAllMembers}
+                  aria-label="Tout désélectionner"
                 >
                   Tout désélectionner
                 </button>
@@ -184,6 +186,7 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
                       type="checkbox"
                       checked={formData.paidFor.includes(member.id)}
                       onChange={() => togglePaidFor(member.id)}
+                      aria-label={`Sélectionner ${member.name}`}
                     />
                     <span>{member.name}</span>
                   </label>
@@ -197,6 +200,7 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
+              aria-label="Annuler la création de la dépense"
             >
               Annuler
             </button>
@@ -204,6 +208,7 @@ const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
               type="submit"
               className="btn btn-primary"
               disabled={createExpenseMutation.isPending}
+              aria-label="Ajouter la dépense"
             >
               {createExpenseMutation.isPending ? 'Ajout...' : 'Ajouter la dépense'}
             </button>

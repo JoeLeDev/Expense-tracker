@@ -48,6 +48,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
                 onGroupEdit(group);
               }}
               title="Modifier le groupe"
+              aria-label={`Modifier le groupe ${group.name}`}
             >
               ✏️
             </button>
@@ -58,6 +59,7 @@ const GroupList: React.FC<GroupListProps> = ({ groups, onGroupSelect, onGroupEdi
                 handleDeleteGroup(group.id, group.name);
               }}
               title="Supprimer le groupe"
+              aria-label={`Supprimer le groupe ${group.name}`}
               disabled={deleteGroupMutation.isPending}
             >
               🗑️

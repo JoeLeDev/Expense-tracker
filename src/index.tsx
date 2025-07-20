@@ -24,30 +24,32 @@ root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
-      <Toaster toaster={toaster}>
-        {(toast) => (
-          <div
-            data-scope="toast"
-            data-part="root"
-            style={{
-              background: toast.type === 'success' ? '#38A169' : toast.type === 'error' ? '#E53E3E' : '#2d3748',
-              color: '#fff',
-              borderRadius: 8,
-              padding: '16px 24px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              fontSize: '1rem',
-              marginTop: 12,
-              maxWidth: 350,
-              position: 'relative',
-            }}
-          >
-            <div data-part="title" style={{ fontWeight: 'bold', marginBottom: 4 }}>{toast.title}</div>
-            {toast.description && (
-              <div data-part="description" style={{ fontSize: '0.95em', opacity: 0.85 }}>{toast.description}</div>
-            )}
-          </div>
-        )}
-      </Toaster>
+      <div aria-live="polite" aria-atomic="true" style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999 }}>
+        <Toaster toaster={toaster}>
+          {(toast) => (
+            <div
+              data-scope="toast"
+              data-part="root"
+              style={{
+                background: toast.type === 'success' ? '#38A169' : toast.type === 'error' ? '#E53E3E' : '#2d3748',
+                color: '#fff',
+                borderRadius: 8,
+                padding: '16px 24px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                fontSize: '1rem',
+                marginTop: 12,
+                maxWidth: 350,
+                position: 'relative',
+              }}
+            >
+              <div data-part="title" style={{ fontWeight: 'bold', marginBottom: 4 }}>{toast.title}</div>
+              {toast.description && (
+                <div data-part="description" style={{ fontSize: '0.95em', opacity: 0.85 }}>{toast.description}</div>
+              )}
+            </div>
+          )}
+        </Toaster>
+      </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </React.StrictMode>

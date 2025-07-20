@@ -104,10 +104,10 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-expense-title">
         <div className="modal-header">
-          <h2>Modifier la dépense</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <h2 id="edit-expense-title">Modifier la dépense</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Fermer la modale">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -191,6 +191,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
                     type="checkbox"
                     checked={formData.paidFor.includes(user.id)}
                     onChange={(e) => handlePaidForChange(user.id, e.target.checked)}
+                    aria-label={`Sélectionner ${user.name}`}
                   />
                   <span>{user.name}</span>
                 </label>
@@ -203,6 +204,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               type="button"
               className="btn btn-secondary"
               onClick={onClose}
+              aria-label="Annuler la modification de la dépense"
             >
               Annuler
             </button>
@@ -210,6 +212,7 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
               type="submit"
               className="btn btn-primary"
               disabled={updateExpenseMutation.isPending}
+              aria-label="Modifier la dépense"
             >
               {updateExpenseMutation.isPending ? 'Modification...' : 'Modifier la dépense'}
             </button>

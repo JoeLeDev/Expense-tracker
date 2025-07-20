@@ -61,6 +61,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, users, onExpenseEdi
                 className="btn btn-secondary btn-small"
                 onClick={() => onExpenseEdit(expense)}
                 title="Modifier la dépense"
+                aria-label={`Modifier la dépense ${expense.description}`}
               >
                 ✏️
               </button>
@@ -68,6 +69,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, users, onExpenseEdi
                 className="btn btn-danger btn-small"
                 onClick={() => handleDeleteExpense(expense.id, expense.description)}
                 title="Supprimer la dépense"
+                aria-label={`Supprimer la dépense ${expense.description}`}
                 disabled={deleteExpenseMutation.isPending}
               >
                 🗑️
