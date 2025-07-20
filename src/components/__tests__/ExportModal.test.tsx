@@ -1,7 +1,16 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ExportModal from '../ExportModal';
 import { Group, Expense, User } from '../../types';
+import * as notifyModule from '../../hooks/notify';
+
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+};
 
 // Mock des utilitaires d'export
 jest.mock('../../utils/exportUtils', () => ({
@@ -9,6 +18,9 @@ jest.mock('../../utils/exportUtils', () => ({
   exportToCSV: jest.fn(),
   exportGroupData: jest.fn()
 }));
+
+jest.mock('../../hooks/notify');
+const mockNotify = notifyModule.notify as jest.Mock;
 
 const mockGroup: Group = {
   id: '1',
@@ -69,7 +81,7 @@ describe('ExportModal', () => {
   });
 
   it('should not render when isOpen is false', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={false}
         onClose={mockOnClose}
@@ -83,7 +95,7 @@ describe('ExportModal', () => {
   });
 
   it('should render when isOpen is true', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -99,7 +111,7 @@ describe('ExportModal', () => {
   });
 
   it('should display group summary correctly', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -115,7 +127,7 @@ describe('ExportModal', () => {
   });
 
   it('should display export options', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -131,7 +143,7 @@ describe('ExportModal', () => {
   });
 
   it('should call onClose when close button is clicked', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -146,7 +158,7 @@ describe('ExportModal', () => {
   });
 
   it('should call onClose when cancel button is clicked', () => {
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -163,7 +175,7 @@ describe('ExportModal', () => {
   it('should handle PDF export', () => {
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -184,7 +196,7 @@ describe('ExportModal', () => {
   it('should handle CSV export', () => {
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -205,7 +217,7 @@ describe('ExportModal', () => {
   it('should handle complete export', () => {
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     
-    render(
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -226,16 +238,9 @@ describe('ExportModal', () => {
     mockAlert.mockRestore();
   });
 
-  it('should handle export errors gracefully', () => {
-    const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
-    const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
-    // Mock une erreur dans l'export
-    mockExportGroupData.mockImplementation(() => {
-      throw new Error('Export error');
-    });
-    
-    render(
+  it('should handle export errors gracefully', async () => {
+    mockExportGroupData.mockImplementation(() => { throw new Error('Export error'); });
+    renderWithQueryClient(
       <ExportModal
         isOpen={true}
         onClose={mockOnClose}
@@ -244,13 +249,16 @@ describe('ExportModal', () => {
         users={mockUsers}
       />
     );
-
     fireEvent.click(screen.getByText('Exporter tout'));
-    
-    expect(mockAlert).toHaveBeenCalledWith('Erreur lors de l\'export');
+    await waitFor(() => {
+      expect(mockNotify).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Erreur',
+          description: "Erreur lors de l'export complet",
+          status: 'error',
+        })
+      );
+    });
     expect(mockOnClose).not.toHaveBeenCalled(); // Le modal ne se ferme pas en cas d'erreur
-    
-    mockAlert.mockRestore();
-    mockConsoleError.mockRestore();
   });
 }); 

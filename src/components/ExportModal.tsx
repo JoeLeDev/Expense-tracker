@@ -1,6 +1,7 @@
 import React from 'react';
 import { Group, Expense, User } from '../types';
 import { exportGroupData } from '../utils/exportUtils';
+import { notify } from '../hooks/notify';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -56,12 +57,28 @@ const ExportModal: React.FC<ExportModalProps> = ({
       // Import dynamique pour éviter les problèmes de SSR
       import('../utils/exportUtils').then(({ exportToPDF }) => {
         exportToPDF(exportData);
+        notify({
+          title: 'Export PDF',
+          description: 'Le PDF a été généré et téléchargé avec succès.',
+          status: 'success',
+        });
+      }).catch((error) => {
+        console.error('Erreur lors de l\'export PDF:', error);
+        notify({
+          title: 'Erreur',
+          description: 'Erreur lors de l\'export PDF',
+          status: 'error',
+        });
       });
       
       onClose();
     } catch (error) {
       console.error('Erreur lors de l\'export PDF:', error);
-      alert('Erreur lors de l\'export PDF');
+      notify({
+        title: 'Erreur',
+        description: 'Erreur lors de l\'export PDF',
+        status: 'error',
+      });
     }
   };
 
@@ -102,22 +119,47 @@ const ExportModal: React.FC<ExportModalProps> = ({
       // Import dynamique pour éviter les problèmes de SSR
       import('../utils/exportUtils').then(({ exportToCSV }) => {
         exportToCSV(exportData);
+        notify({
+          title: 'Export CSV',
+          description: 'Les fichiers CSV ont été générés et téléchargés avec succès.',
+          status: 'success',
+        });
+      }).catch((error) => {
+        console.error('Erreur lors de l\'export CSV:', error);
+        notify({
+          title: 'Erreur',
+          description: 'Erreur lors de l\'export CSV',
+          status: 'error',
+        });
       });
       
       onClose();
     } catch (error) {
       console.error('Erreur lors de l\'export CSV:', error);
-      alert('Erreur lors de l\'export CSV');
+      notify({
+        title: 'Erreur',
+        description: 'Erreur lors de l\'export CSV',
+        status: 'error',
+      });
     }
   };
 
   const handleExportAll = () => {
     try {
       exportGroupData(group, expenses, users);
+      notify({
+        title: 'Export complet',
+        description: 'Le PDF et les fichiers CSV ont été générés et téléchargés avec succès.',
+        status: 'success',
+      });
       onClose();
     } catch (error) {
       console.error('Erreur lors de l\'export:', error);
-      alert('Erreur lors de l\'export');
+      notify({
+        title: 'Erreur',
+        description: 'Erreur lors de l\'export complet',
+        status: 'error',
+      });
     }
   };
 

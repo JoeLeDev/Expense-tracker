@@ -209,7 +209,7 @@ describe('useDeleteGroup', () => {
       act(async () => {
         await result.current.mutateAsync('groupe-inexistant');
       })
-    ).rejects.toThrow('Group not found');
+    ).rejects.toThrow('Groupe introuvable');
 
     // Vérifier qu'aucune modification n'a été faite
     expect(localStorageMock.setItem).not.toHaveBeenCalled();

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Group, GroupFormData, User } from '../types';
 import { useAddHistoryEntry, createGroupHistoryEntry } from './useHistory';
+import { notify } from './notify';
 
 // Simulation d'une API locale avec localStorage
 const GROUPS_KEY = 'sumeria_groups';
@@ -116,9 +117,21 @@ export const useCreateGroup = () => {
       
       return newGroup;
     },
-    onSuccess: () => {
+    onSuccess: (newGroup) => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      notify({
+        title: 'Groupe créé',
+        description: `Le groupe "${newGroup.name}" a été créé avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la création du groupe.',
+        status: 'error',
+      });
     },
   });
 };
@@ -132,7 +145,7 @@ export const useUpdateGroup = () => {
       const groups = getGroups();
       const index = groups.findIndex(group => group.id === data.id);
       
-      if (index === -1) throw new Error('Group not found');
+      if (index === -1) throw new Error('Groupe introuvable');
       
       const updatedGroup: Group = {
         ...groups[index],
@@ -170,8 +183,20 @@ export const useUpdateGroup = () => {
       
       return groups[index];
     },
-    onSuccess: () => {
+    onSuccess: (updatedGroup) => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      notify({
+        title: 'Groupe modifié',
+        description: `Le groupe "${updatedGroup.name}" a été modifié avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la modification du groupe.',
+        status: 'error',
+      });
     },
   });
 };
@@ -184,7 +209,7 @@ export const useDeleteGroup = () => {
     mutationFn: async (groupId: string) => {
       const groups = getGroups();
       const group = groups.find(g => g.id === groupId);
-      if (!group) throw new Error('Group not found');
+      if (!group) throw new Error('Groupe introuvable');
       
       const filteredGroups = groups.filter(g => g.id !== groupId);
       saveGroups(filteredGroups);
@@ -203,8 +228,20 @@ export const useDeleteGroup = () => {
       
       return group;
     },
-    onSuccess: () => {
+    onSuccess: (deletedGroup) => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      notify({
+        title: 'Groupe supprimé',
+        description: `Le groupe "${deletedGroup.name}" a été supprimé avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la suppression du groupe.',
+        status: 'error',
+      });
     },
   });
 }; 

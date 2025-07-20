@@ -1,7 +1,15 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ExpenseList from '../ExpenseList';
 import { Expense, User } from '../../types';
+
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+};
 
 // Mock des hooks
 const mockMutateAsync = jest.fn();
@@ -56,7 +64,7 @@ describe('ExpenseList', () => {
   });
 
   it('affiche la liste des dépenses', () => {
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -72,7 +80,7 @@ describe('ExpenseList', () => {
   });
 
   it('affiche un message quand il n\'y a pas de dépenses', () => {
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={[]} 
         users={mockUsers}
@@ -85,7 +93,7 @@ describe('ExpenseList', () => {
   });
 
   it('affiche les boutons d\'édition et de suppression pour chaque dépense', () => {
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -101,7 +109,7 @@ describe('ExpenseList', () => {
   });
 
   it('appelle onExpenseEdit quand on clique sur le bouton d\'édition', () => {
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -119,7 +127,7 @@ describe('ExpenseList', () => {
     const mockConfirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -146,7 +154,7 @@ describe('ExpenseList', () => {
     const mockConfirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -169,7 +177,7 @@ describe('ExpenseList', () => {
     const mockConfirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
     const mockAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -189,7 +197,7 @@ describe('ExpenseList', () => {
   });
 
   it('affiche les détails de la dépense correctement', () => {
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={mockExpenses} 
         users={mockUsers}
@@ -220,7 +228,7 @@ describe('ExpenseList', () => {
       updatedAt: new Date()
     };
 
-    render(
+    renderWithQueryClient(
       <ExpenseList 
         expenses={[expenseWithUnknownUser]} 
         users={mockUsers}

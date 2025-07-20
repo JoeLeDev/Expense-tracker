@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUpdateGroup } from '../hooks/useGroups';
 import { Group } from '../types';
+import { notify } from '../hooks/notify';
 
 interface EditGroupModalProps {
   isOpen: boolean;
@@ -41,7 +42,11 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
     const members = formData.members.filter(member => member.trim() !== '');
     if (members.length === 0) {
-      alert('Veuillez ajouter au moins un membre');
+      notify({
+        title: 'Erreur',
+        description: 'Veuillez ajouter au moins un membre',
+        status: 'error',
+      });
       return;
     }
 
@@ -54,10 +59,19 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
           members
         }
       });
+      notify({
+        title: 'Groupe modifié',
+        description: 'Le groupe a été modifié avec succès.',
+        status: 'success',
+      });
       onSuccess();
       onClose();
     } catch (error) {
-      alert('Erreur lors de la modification du groupe');
+      notify({
+        title: 'Erreur',
+        description: 'Erreur lors de la modification du groupe',
+        status: 'error',
+      });
     }
   };
 
@@ -66,6 +80,11 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
       ...prev,
       members: [...prev.members, '']
     }));
+    notify({
+      title: 'Membre ajouté',
+      description: 'Un nouveau membre a été ajouté au groupe.',
+      status: 'info',
+    });
   };
 
   const removeMember = (index: number) => {
@@ -73,6 +92,11 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
       ...prev,
       members: prev.members.filter((_, i) => i !== index)
     }));
+    notify({
+      title: 'Membre supprimé',
+      description: 'Le membre a été retiré du groupe.',
+      status: 'warning',
+    });
   };
 
   const updateMember = (index: number, value: string) => {

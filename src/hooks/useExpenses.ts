@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Expense, ExpenseFormData } from '../types';
+import { notify } from './notify';
 
 // Récupérer les dépenses depuis localStorage
 const getExpenses = (): Expense[] => {
@@ -57,9 +58,21 @@ export const useCreateExpense = () => {
       saveExpenses(updatedExpenses);
       return newExpense;
     },
-    onSuccess: () => {
+    onSuccess: (newExpense) => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
-    }
+      notify({
+        title: 'Dépense ajoutée',
+        description: `La dépense "${newExpense.description}" a été ajoutée avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de l\'ajout de la dépense.',
+        status: 'error',
+      });
+    },
   });
 };
 
@@ -86,9 +99,21 @@ export const useUpdateExpense = () => {
       saveExpenses(expenses);
       return updatedExpense;
     },
-    onSuccess: () => {
+    onSuccess: (updatedExpense) => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
-    }
+      notify({
+        title: 'Dépense modifiée',
+        description: `La dépense "${updatedExpense.description}" a été modifiée avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la modification de la dépense.',
+        status: 'error',
+      });
+    },
   });
 };
 
@@ -108,8 +133,20 @@ export const useDeleteExpense = () => {
       saveExpenses(filteredExpenses);
       return expenseId;
     },
-    onSuccess: () => {
+    onSuccess: (deletedExpenseId) => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
-    }
+      notify({
+        title: 'Dépense supprimée',
+        description: `La dépense a été supprimée avec succès.`,
+        status: 'success',
+      });
+    },
+    onError: (error) => {
+      notify({
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la suppression de la dépense.',
+        status: 'error',
+      });
+    },
   });
 }; 
