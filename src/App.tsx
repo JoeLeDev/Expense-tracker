@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGroups } from './hooks/useGroups';
 import GroupList from './components/GroupList';
 import GroupDetail from './components/GroupDetail';
@@ -19,6 +19,10 @@ function App() {
   const GROUPS_PER_PAGE = 5;
   const totalGroupPages = Math.ceil(groups.length / GROUPS_PER_PAGE);
   const paginatedGroups = groups.slice((groupPage - 1) * GROUPS_PER_PAGE, groupPage * GROUPS_PER_PAGE);
+
+  useEffect(() => {
+    setGroupPage(1);
+  }, [groups.length]);
 
   const handleGroupSelect = (groupId: string) => {
     setSelectedGroupId(groupId);
