@@ -3,6 +3,8 @@ import { useUpdateGroup } from '../hooks/useGroups';
 import { Group } from '../types';
 import { notify } from '../hooks/notify';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Modal } from '../ui/Modal';
 
 interface EditGroupModalProps {
   isOpen: boolean;
@@ -105,98 +107,83 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
   if (!isOpen || !group) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-group-title">
-        <div className="modal-header">
-          <h2 id="edit-group-title">Modifier le groupe</h2>
+    <Modal isOpen={isOpen && !!group} onClose={onClose} title="Modifier le groupe" labelledById="edit-group-title">
+      <form onSubmit={handleSubmit} className="modal-form">
+        <div className="form-group">
+          <label htmlFor="name">Nom du groupe *</label>
+          <Input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            required
+            placeholder="Ex: Voyage à Paris"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="description">Description (optionnel)</label>
+          <Input
+            textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Ex: Dépenses pour notre voyage à Paris"
+            rows={3}
+          />
+        </div>
+        <div className="form-group">
+          <label>Membres du groupe *</label>
+          {formData.members.map((member, index) => (
+            <div key={index} className="member-input">
+              <Input
+                type="text"
+                value={member}
+                onChange={(e) => updateMember(index, e.target.value)}
+                placeholder="Nom du membre"
+                required
+                aria-label={`Nom du membre ${index + 1}`}
+              />
+              {formData.members.length > 1 && (
+                <Button
+                  type="button"
+                  className="btn btn-danger btn-small"
+                  onClick={() => removeMember(index)}
+                  aria-label={`Supprimer le membre ${index + 1}`}
+                >
+                  ×
+                </Button>
+              )}
+            </div>
+          ))}
           <Button
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Fermer la modale"
+            type="button"
+            className="btn btn-secondary"
+            onClick={addMember}
+            aria-label="Ajouter un membre"
           >
-            ×
+            + Ajouter un membre
           </Button>
         </div>
-
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="name">Nom du groupe *</label>
-            <input
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              required
-              placeholder="Ex: Voyage à Paris"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description (optionnel)</label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Ex: Dépenses pour notre voyage à Paris"
-              rows={3}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Membres du groupe *</label>
-            {formData.members.map((member, index) => (
-              <div key={index} className="member-input">
-                <input
-                  type="text"
-                  value={member}
-                  onChange={(e) => updateMember(index, e.target.value)}
-                  placeholder="Nom du membre"
-                  required
-                  aria-label={`Nom du membre ${index + 1}`}
-                />
-                {formData.members.length > 1 && (
-                  <Button
-                    type="button"
-                    className="btn btn-danger btn-small"
-                    onClick={() => removeMember(index)}
-                    aria-label={`Supprimer le membre ${index + 1}`}
-                  >
-                    ×
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              className="btn btn-secondary"
-              onClick={addMember}
-              aria-label="Ajouter un membre"
-            >
-              + Ajouter un membre
-            </Button>
-          </div>
-
-          <div className="modal-actions">
-            <Button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              aria-label="Annuler la modification du groupe"
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary"
-              disabled={updateGroupMutation.isPending}
-              aria-label="Modifier le groupe"
-            >
-              {updateGroupMutation.isPending ? 'Modification...' : 'Modifier le groupe'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="modal-actions">
+          <Button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onClose}
+            aria-label="Annuler la modification du groupe"
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            className="btn btn-primary"
+            disabled={updateGroupMutation.isPending}
+            aria-label="Modifier le groupe"
+          >
+            {updateGroupMutation.isPending ? 'Modification...' : 'Modifier le groupe'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

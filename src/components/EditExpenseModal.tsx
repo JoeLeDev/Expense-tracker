@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useUpdateExpense } from '../hooks/useExpenses';
 import { Expense, User } from '../types';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Modal } from '../ui/Modal';
 
 interface EditExpenseModalProps {
   isOpen: boolean;
@@ -101,132 +103,111 @@ const EditExpenseModal: React.FC<EditExpenseModalProps> = ({
     }
   };
 
-  if (!isOpen || !expense) return null;
-
   return (
-    <div className="modal-overlay">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="edit-expense-title">
-        <div className="modal-header">
-          <h2 id="edit-expense-title">Modifier la dépense</h2>
-          <Button
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Fermer la modale"
+    <Modal isOpen={isOpen && !!expense} onClose={onClose} title="Modifier la dépense" labelledById="edit-expense-title">
+      <form onSubmit={handleSubmit} className="modal-form">
+        <div className="form-group">
+          <label htmlFor="description">Description *</label>
+          <Input
+            type="text"
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            required
+            placeholder="Ex: Restaurant, Transport, etc."
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="amount">Montant (€) *</label>
+          <Input
+            type="number"
+            id="amount"
+            value={formData.amount}
+            onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+            required
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="category">Catégorie (optionnel)</label>
+          <select
+            id="category"
+            value={formData.category}
+            onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
           >
-            ×
+            <option value="">Sélectionner une catégorie</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Transport">Transport</option>
+            <option value="Logement">Logement</option>
+            <option value="Loisirs">Loisirs</option>
+            <option value="Courses">Courses</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label htmlFor="date">Date *</label>
+          <Input
+            type="date"
+            id="date"
+            value={formData.date.toISOString().split('T')[0]}
+            onChange={(e) => setFormData(prev => ({ ...prev, date: new Date(e.target.value) }))}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="paidBy">Payé par *</label>
+          <select
+            id="paidBy"
+            value={formData.paidBy}
+            onChange={(e) => setFormData(prev => ({ ...prev, paidBy: e.target.value }))}
+            required
+          >
+            <option value="">Sélectionner qui a payé</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Payé pour *</label>
+          <div className="checkbox-group">
+            {users.map((user) => (
+              <label key={user.id} className="checkbox-item">
+                <input
+                  type="checkbox"
+                  checked={formData.paidFor.includes(user.id)}
+                  onChange={(e) => handlePaidForChange(user.id, e.target.checked)}
+                  aria-label={`Sélectionner ${user.name}`}
+                />
+                <span>{user.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="modal-actions">
+          <Button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onClose}
+            aria-label="Annuler la modification de la dépense"
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            className="btn btn-primary"
+            disabled={updateExpenseMutation.isPending}
+            aria-label="Modifier la dépense"
+          >
+            {updateExpenseMutation.isPending ? 'Modification...' : 'Modifier la dépense'}
           </Button>
         </div>
-
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="description">Description *</label>
-            <input
-              type="text"
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              required
-              placeholder="Ex: Restaurant, Transport, etc."
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="amount">Montant (€) *</label>
-            <input
-              type="number"
-              id="amount"
-              value={formData.amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-              required
-              min="0"
-              step="0.01"
-              placeholder="0.00"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category">Catégorie (optionnel)</label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-            >
-              <option value="">Sélectionner une catégorie</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Transport">Transport</option>
-              <option value="Logement">Logement</option>
-              <option value="Loisirs">Loisirs</option>
-              <option value="Courses">Courses</option>
-              <option value="Autre">Autre</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="date">Date *</label>
-            <input
-              type="date"
-              id="date"
-              value={formData.date.toISOString().split('T')[0]}
-              onChange={(e) => setFormData(prev => ({ ...prev, date: new Date(e.target.value) }))}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="paidBy">Payé par *</label>
-            <select
-              id="paidBy"
-              value={formData.paidBy}
-              onChange={(e) => setFormData(prev => ({ ...prev, paidBy: e.target.value }))}
-              required
-            >
-              <option value="">Sélectionner qui a payé</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Payé pour *</label>
-            <div className="checkbox-group">
-              {users.map((user) => (
-                <label key={user.id} className="checkbox-item">
-                  <input
-                    type="checkbox"
-                    checked={formData.paidFor.includes(user.id)}
-                    onChange={(e) => handlePaidForChange(user.id, e.target.checked)}
-                    aria-label={`Sélectionner ${user.name}`}
-                  />
-                  <span>{user.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="modal-actions">
-            <Button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              aria-label="Annuler la modification de la dépense"
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary"
-              disabled={updateExpenseMutation.isPending}
-              aria-label="Modifier la dépense"
-            >
-              {updateExpenseMutation.isPending ? 'Modification...' : 'Modifier la dépense'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 };
 

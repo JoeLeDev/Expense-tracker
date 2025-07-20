@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useCreateGroup } from '../hooks/useGroups';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Modal } from '../ui/Modal';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -67,98 +69,83 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="create-group-title">
-        <div className="modal-header">
-          <h2 id="create-group-title">Créer un nouveau groupe</h2>
+    <Modal isOpen={isOpen} onClose={onClose} title="Créer un nouveau groupe" labelledById="create-group-title">
+      <form onSubmit={handleSubmit} className="modal-form">
+        <div className="form-group">
+          <label htmlFor="name">Nom du groupe *</label>
+          <Input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            required
+            placeholder="Ex: Voyage à Paris"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="description">Description (optionnel)</label>
+          <Input
+            textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Ex: Dépenses pour notre voyage à Paris"
+            rows={3}
+          />
+        </div>
+        <div className="form-group">
+          <label>Membres du groupe *</label>
+          {formData.members.map((member, index) => (
+            <div key={index} className="member-input">
+              <Input
+                type="text"
+                value={member}
+                onChange={(e) => updateMember(index, e.target.value)}
+                placeholder="Nom du membre"
+                required
+                aria-label={`Nom du membre ${index + 1}`}
+              />
+              {formData.members.length > 1 && (
+                <Button
+                  type="button"
+                  className="btn btn-danger btn-small"
+                  onClick={() => removeMember(index)}
+                  aria-label={`Supprimer le membre ${index + 1}`}
+                >
+                  ×
+                </Button>
+              )}
+            </div>
+          ))}
           <Button
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Fermer la modale"
+            type="button"
+            className="btn btn-secondary"
+            onClick={addMember}
+            aria-label="Ajouter un membre"
           >
-            ×
+            + Ajouter un membre
           </Button>
         </div>
-
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="name">Nom du groupe *</label>
-            <input
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              required
-              placeholder="Ex: Voyage à Paris"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description (optionnel)</label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Ex: Dépenses pour notre voyage à Paris"
-              rows={3}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Membres du groupe *</label>
-            {formData.members.map((member, index) => (
-              <div key={index} className="member-input">
-                <input
-                  type="text"
-                  value={member}
-                  onChange={(e) => updateMember(index, e.target.value)}
-                  placeholder="Nom du membre"
-                  required
-                  aria-label={`Nom du membre ${index + 1}`}
-                />
-                {formData.members.length > 1 && (
-                  <Button
-                    type="button"
-                    className="btn btn-danger btn-small"
-                    onClick={() => removeMember(index)}
-                    aria-label={`Supprimer le membre ${index + 1}`}
-                  >
-                    ×
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type="button"
-              className="btn btn-secondary"
-              onClick={addMember}
-              aria-label="Ajouter un membre"
-            >
-              + Ajouter un membre
-            </Button>
-          </div>
-
-          <div className="modal-actions">
-            <Button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              aria-label="Annuler la création du groupe"
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="btn btn-primary"
-              disabled={createGroupMutation.isPending}
-              aria-label="Créer le groupe"
-            >
-              {createGroupMutation.isPending ? 'Création...' : 'Créer le groupe'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="modal-actions">
+          <Button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onClose}
+            aria-label="Annuler la création du groupe"
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            className="btn btn-primary"
+            disabled={createGroupMutation.isPending}
+            aria-label="Créer le groupe"
+          >
+            {createGroupMutation.isPending ? 'Création...' : 'Créer le groupe'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 
