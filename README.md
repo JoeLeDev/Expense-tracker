@@ -2,6 +2,10 @@
 
 Une application web moderne pour gérer les remboursements entre amis, inspirée de Lydia. Développée avec React, TypeScript et les meilleures pratiques de développement moderne.
 
+## 🌐 Démo en ligne
+
+👉 [Voir la démo sur Vercel](https://expense-tracker-fl42.vercel.app/)
+
 ## 🚀 Fonctionnalités
 
 ### ✅ Fonctionnalités principales
@@ -17,6 +21,8 @@ Une application web moderne pour gérer les remboursements entre amis, inspirée
 - **Historique complet** : Consultez toutes vos dépenses avec dates et détails
 - **Calculs précis** : Arrondis à 2 décimales pour éviter les erreurs
 - **Interface intuitive** : Design moderne et UX optimisée
+- **Pagination automatique** : Navigation fluide dans les listes de groupes et de dépenses
+- **Notifications toasts** : Feedback utilisateur moderne et accessible (Ark UI)
 
 ## 🛠️ Stack Technique
 
@@ -24,6 +30,9 @@ Une application web moderne pour gérer les remboursements entre amis, inspirée
 - **React 18** : Framework principal avec hooks modernes
 - **TypeScript** : Typage statique pour un code plus robuste
 - **React Query (TanStack Query)** : Gestion d'état serveur et cache intelligent
+- **Ark UI (Chakra UI v3)** : Système de composants UI moderne et accessible (toasts, modals, etc.)
+- **Pagination côté client** : Expérience fluide même avec beaucoup de données
+- **Composants UI factorisés** : `ui/Button`, `ui/Input`, `ui/Modal`
 - **CSS Modules** : Styles modulaires et responsive
 
 ### Architecture
@@ -36,6 +45,7 @@ Une application web moderne pour gérer les remboursements entre amis, inspirée
 - **ESLint** : Linting du code
 - **Prettier** : Formatage automatique
 - **Create React App** : Configuration optimisée
+
 
 ## 📦 Installation
 
@@ -83,6 +93,10 @@ src/
 │   ├── CreateExpenseModal.tsx
 │   ├── ExpenseList.tsx
 │   └── BalanceSummary.tsx
+├── ui/                 # Composants UI factorisés (Button, Input, Modal)
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   └── Modal.tsx
 ├── hooks/              # Hooks personnalisés
 │   ├── useGroups.ts
 │   └── useExpenses.ts
@@ -109,7 +123,9 @@ src/
 ### Interface utilisateur
 - **Design responsive** : Mobile-first approach
 - **Composants modulaires** : Réutilisabilité maximale
-- **Accessibilité** : Standards WCAG respectés
+- **Accessibilité** : Rôles ARIA, aria-live, navigation clavier, standards WCAG respectés
+- **Notifications** : Toasts Ark UI accessibles
+- **Pagination** : Navigation fluide dans les listes longues
 
 ## 🧪 Tests
 
@@ -133,7 +149,7 @@ Les tests couvrent :
 ## 📱 Fonctionnalités par écran
 
 ### Page d'accueil
-- Liste des groupes existants
+- Liste des groupes existants (paginée)
 - Bouton de création de groupe
 - État vide avec call-to-action
 
@@ -144,7 +160,7 @@ Les tests couvrent :
 
 ### Détail du groupe
 - Résumé des soldes
-- Liste des dépenses récentes
+- Liste des dépenses récentes (paginée)
 - Bouton d'ajout de dépense
 
 ### Ajout de dépense
