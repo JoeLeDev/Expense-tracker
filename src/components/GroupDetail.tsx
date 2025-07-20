@@ -19,6 +19,8 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [expensePage, setExpensePage] = useState(1);
+  const EXPENSES_PER_PAGE = 5;
   
   const { data: groups = [] } = useGroups();
   const { data: expenses = [] } = useExpenses(groupId);
@@ -57,6 +59,9 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
     alert('Dépense modifiée avec succès !');
   };
 
+  const totalExpensePages = Math.ceil(groupExpenses.length / EXPENSES_PER_PAGE);
+  const paginatedExpenses = groupExpenses.slice((expensePage - 1) * EXPENSES_PER_PAGE, expensePage * EXPENSES_PER_PAGE);
+
   return (
     <div className="group-detail">
       <div className="group-header">
@@ -87,10 +92,17 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ groupId, onBack }) => {
       </div>
 
       <ExpenseList 
-        expenses={groupExpenses}
+        expenses={paginatedExpenses}
         users={group.members}
         onExpenseEdit={handleEditExpense}
       />
+      {groupExpenses.length > EXPENSES_PER_PAGE && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+          <button className="btn btn-secondary btn-small" onClick={() => setExpensePage(p => Math.max(1, p - 1))} disabled={expensePage === 1}>Précédent</button>
+          <span style={{ alignSelf: 'center' }}>Page {expensePage} / {totalExpensePages}</span>
+          <button className="btn btn-secondary btn-small" onClick={() => setExpensePage(p => Math.min(totalExpensePages, p + 1))} disabled={expensePage === totalExpensePages}>Suivant</button>
+        </div>
+      )}
 
       {/* Create Expense Modal */}
       <CreateExpenseModal

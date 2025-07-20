@@ -15,6 +15,10 @@ function App() {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const { data: groups = [], isLoading, error } = useGroups();
+  const [groupPage, setGroupPage] = useState(1);
+  const GROUPS_PER_PAGE = 5;
+  const totalGroupPages = Math.ceil(groups.length / GROUPS_PER_PAGE);
+  const paginatedGroups = groups.slice((groupPage - 1) * GROUPS_PER_PAGE, groupPage * GROUPS_PER_PAGE);
 
   const handleGroupSelect = (groupId: string) => {
     setSelectedGroupId(groupId);
@@ -106,10 +110,17 @@ function App() {
               </div>
             ) : (
               <GroupList 
-                groups={groups} 
+                groups={paginatedGroups} 
                 onGroupSelect={handleGroupSelect}
                 onGroupEdit={handleEditGroup}
               />
+            )}
+            {groups.length > GROUPS_PER_PAGE && (
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+                <button className="btn btn-secondary btn-small" onClick={() => setGroupPage(p => Math.max(1, p - 1))} disabled={groupPage === 1}>Précédent</button>
+                <span style={{ alignSelf: 'center' }}>Page {groupPage} / {totalGroupPages}</span>
+                <button className="btn btn-secondary btn-small" onClick={() => setGroupPage(p => Math.min(totalGroupPages, p + 1))} disabled={groupPage === totalGroupPages}>Suivant</button>
+              </div>
             )}
           </div>
         )}
